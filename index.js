@@ -32,7 +32,7 @@ module.exports = function (password, minimumRequiredToPass = null, criteria = de
                 // errors / a checklist for a password input in a UI
                 validationResults.critical++;
             }
-        };
+        }
     });
 
     // 4. Check minimum number of required criteria is met and no critical errors
