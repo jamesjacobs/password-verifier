@@ -8,44 +8,116 @@ describe('When no password is provided', () => {
     });
 });
 
-describe('When a password is provided', () => {
-    describe('if the password has less than 9 chars', () => {
-        let password = 'abcdefgh';
+describe('When a password is provided and there is a minimum number of requirements', () => {
+    let minimumNumberOfRequirements = 3;
 
-        it('should throw an error', () => {
-            expect(() => {verifyPassword(password)}).toThrow('Password must be at least 9 characters long');
-        });
-    });
-
-    describe('if the password is missing an uppercase letter', () => {
-        let password = 'abcdefghi';
-
-        it('should throw an error', () => {
-            expect(() => {verifyPassword(password)}).toThrow('Password must contain at least 1 uppercase letter');
-        });
-    });
-
-    describe('if the password is missing a lowercase letter', () => {
-        let password = 'ABCDEFGHI';
-
-        it('should throw an error', () => {
-            expect(() => {verifyPassword(password)}).toThrow('Password must contain at least 1 lowercase letter');
-        });
-    });
-
-    describe('if the password is missing at least one number', () => {
-        let password = 'AbCDEFGHI';
-
-        it('should throw an error', () => {
-            expect(() => {verifyPassword(password)}).toThrow('Password must contain at least 1 number');
-        });
-    });
-
-    describe('if the password meets the criteria', () => {
+    describe('if the password meets the minimum number of criteria', () => {
         let password = 'AbCDEFGH1';
 
         it('should return true', () => {
-            expect(verifyPassword(password)).toBe(true);
+            expect(verifyPassword(password, minimumNumberOfRequirements)).toBe(true);
+        });
+    });
+
+    describe('If one requirement (number) is met but others are not', () => {
+        let password = '1';
+
+        it('should throw an array of errors', () => {
+            expect(() => {verifyPassword(password, minimumNumberOfRequirements)}).toThrow([
+                'Password should be longer than 8 characters',
+                'Password should contain at least 1 uppercase letter',
+                'Password should contain at least 1 lowercase letter'
+            ]);
+        });
+    });
+
+    describe('If one requirement (upper) is met but others are not', () => {
+        let password = 'A';
+
+        it('should throw an array of errors', () => {
+            expect(() => {verifyPassword(password, minimumNumberOfRequirements)}).toThrow([
+                'Password should be longer than 8 characters',
+                'Password should contain at least 1 lowercase letter',
+                'Password should contain at least 1 number'
+            ]);
+        });
+    });
+
+    describe('If one requirement (lower) is met but others are not', () => {
+        let password = 'a';
+
+        it('should throw an array of errors', () => {
+            expect(() => {verifyPassword(password, minimumNumberOfRequirements)}).toThrow([
+                'Password should be longer than 8 characters',
+                'Password should contain at least 1 uppercase letter',
+                'Password should contain at least 1 number'
+            ]);
+        });
+    });
+
+    describe('If two requirements (length and lower) are met but others are not', () => {
+        let password = 'aaaaaaaaa';
+
+        it('should throw an array of errors', () => {
+            expect(() => {verifyPassword(password, minimumNumberOfRequirements)}).toThrow([
+                'Password should contain at least 1 uppercase letter',
+                'Password should contain at least 1 number'
+            ]);
+        });
+    });
+
+    describe('If two requirements (length and upper) are met but others are not', () => {
+        let password = 'AAAAAAAAA';
+
+        it('should throw an array of errors', () => {
+            expect(() => {verifyPassword(password, minimumNumberOfRequirements)}).toThrow([
+                'Password should contain at least 1 lowercase letter',
+                'Password should contain at least 1 number'
+            ]);
+        });
+    });
+
+    describe('If two requirements (length and number) are met but others are not', () => {
+        let password = '111111111';
+
+        it('should throw an array of errors', () => {
+            expect(() => {verifyPassword(password, minimumNumberOfRequirements)}).toThrow([
+                'Password should contain at least 1 uppercase letter',
+                'Password should contain at least 1 lowercase letter'
+            ]);
+        });
+    });
+
+    describe('If two requirements (lower and upper) are met but others are not', () => {
+        let password = 'Ab';
+
+        it('should throw an array of errors', () => {
+            expect(() => {verifyPassword(password, minimumNumberOfRequirements)}).toThrow([
+                'Password should be longer than 8 characters',
+                'Password should contain at least 1 number'
+            ]);
+        });
+    });
+
+    describe('If two requirements (lower and number) are met but others are not', () => {
+        let password = 'a1';
+
+        it('should throw an array of errors', () => {
+            expect(() => {verifyPassword(password, minimumNumberOfRequirements)}).toThrow([
+                'Password should be longer than 8 characters',
+                'Password should contain at least 1 uppercase letter'
+            ]);
+        });
+    });
+
+    describe('If two requirements (upper and number) are met but others are not', () => {
+        let password = 'A1';
+
+        it('should throw an array of errors', () => {
+            expect(() => {verifyPassword(password, minimumNumberOfRequirements)}).toThrow([
+                'Password should be longer than 8 characters',
+                'Password should contain at least 1 lowercase letter'
+            ]);
         });
     });
 });

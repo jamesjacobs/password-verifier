@@ -1,25 +1,36 @@
-module.exports = function (password) {
+const Validator = require('./libs/Validator');
+const defaultCriteria = require('./libs/criteria');
+
+module.exports = function (password, minimumRequiredToPass = null, criteria = defaultCriteria) {
+
     // 1. Password should not be null
-    if (password == null) {
+    if (!password) {
         throw('A password must be provided');
     }
-    // 2. Password should be larger than 8 chars
-    if (password.length < 9) {
-        throw('Password must be at least 9 characters long');
-    }
-    // 3. The password should have one uppercase letter at least
-    if (!(/[A-Z]/.test(password))) {
-        throw("Password must contain at least 1 uppercase letter")
-    };
-    // 4. The password should have one lowercase letter at least
-    if (!(/[a-z]/.test(password))) {
-        throw("Password must contain at least 1 lowercase letter")
-    };
-    // 5. The password should have one number at least
-    if (!(/[0-9]/.test(password))) {
-        throw("Password must contain at least 1 number")
-    };
 
-    // 🙌 Password meets criteria 🎉
-    return true;
+    // 2. Assume all criteria is required if none passed
+    if (!minimumRequiredToPass) {
+        minimumRequiredToPass = criteria.length + 1;
+    }
+
+    // 3. Build up results / errors
+    let validationResults = {'success': 0, 'errors': []};
+
+    criteria.map(criteria => {
+        const validator = new Validator(criteria.regex);
+        if (validator.validatePassword(password)) {
+            validationResults.success++;
+        } else {
+            validationResults.errors.push(criteria.message);
+        };
+    });
+
+    // 4. Check minimum number of required criteria is met
+    if (validationResults.success >= minimumRequiredToPass) {
+        // 🙌 Password meets criteria 🎉
+        return true;
+    } else {
+        // 🚨 We've got issues 🚨
+        throw(validationResults.errors);
+    }
 };
