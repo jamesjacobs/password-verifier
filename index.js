@@ -14,7 +14,7 @@ module.exports = function (password, minimumRequiredToPass = null, criteria = de
     }
 
     // 3. Build up results / errors
-    let validationResults = {'success': 0, 'errors': []};
+    let validationResults = {'success': 0, 'errors': [], 'critical': 0};
 
     criteria.map(criteria => {
         const validator = new Validator(criteria.regex);
@@ -22,11 +22,21 @@ module.exports = function (password, minimumRequiredToPass = null, criteria = de
             validationResults.success++;
         } else {
             validationResults.errors.push(criteria.message);
+
+            // 🚨 A required criteria was not met 🚨
+            if (criteria.required) {
+                // We could stop and throw an error here to meet extra consideration 1 as
+                // the required crtieria has not been met. However, from a UI point of view,
+                // I'd rather display all the errors so that the user can see all requirements
+                // rather than one at a time when typing assuming this would be used to display
+                // errors / a checklist for a password input in a UI
+                validationResults.critical++;
+            }
         };
     });
 
-    // 4. Check minimum number of required criteria is met
-    if (validationResults.success >= minimumRequiredToPass) {
+    // 4. Check minimum number of required criteria is met and no critical errors
+    if ((validationResults.success >= minimumRequiredToPass) && validationResults.critical === 0) {
         // 🙌 Password meets criteria 🎉
         return true;
     } else {
